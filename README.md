@@ -1,7 +1,7 @@
-yii2-mygii
+yii2-double-model-gii
 ==========
 
-My yii2 generators
+This generator generates two ActiveRecord class for the specified database table. An empty one you can extend and a Base one which is the same as the original model generatior.
 
 ## Installation
 
