@@ -7,7 +7,7 @@ namespace <?= $generator->ns ?>;
 
 use Yii;
 
-class <?= $className ?> extends <?= $className.'Base' . "\n" ?>
+class <?= $className ?> extends <?= '\\'.$generator->ns.'\\base\\'.$className.'Base' . "\n" ?>
 {
     
 }
