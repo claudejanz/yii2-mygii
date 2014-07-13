@@ -3,9 +3,7 @@
     "description": "Gii Generator for double model generation",
     "authors": [
         {
-
             "name": "Claude Janz",
-
             "email": "claudejanz@gmail.com"
         }
     ],
