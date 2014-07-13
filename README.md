@@ -25,15 +25,23 @@ to the ```require``` section of your `composer.json` file.
 
 ```php
 //if your gii modules configuration looks like below:
-$config['modules']['gii'] = 'yii\gii\Module';
+    $config['bootstrap'][] = 'gii';
+    $config['modules']['gii'] = 'yii\gii\Module';
 
-//change it to
-$config['modules']['gii']['class'] = 'yii\gii\Module';
+//remove this two lines
 ```
 
 ```php
-//Add this into backend/config/main-local.php
-$config['modules']['gii']['generators'] = [
-    'doubleModel' => ['class' => 'claudejanz\mygii\generators\model\Generator'],
-];
+//Add this into common/config/main-local.php
+    'bootstrap' => 'gii',
+    'modules' => [
+        'gii' => [
+            'class' => 'yii\gii\Module',
+            'generators' => [
+                'doubleModel' => [
+                    'class' => 'claudejanz\mygii\generators\model\Generator',
+                ],
+            ],
+        ],
+    ],
 ```
