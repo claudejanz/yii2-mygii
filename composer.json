@@ -1,0 +1,20 @@
+{
+    "name": "claudejanz/yii2-mygii",
+    "description": "Gii Generator for double model generation",
+    "authors": [
+        {
+
+            "name": "Claude Janz",
+
+            "email": "claudejanz@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "claudejanz\\yii2-mygii\\": "/claudejanz/yii2-mygii"
+        }
+    },
+    "require": {
+        "php": ">=5.3.0"
+    }
+}
