@@ -18,6 +18,9 @@ echo "<?php\n";
 namespace <?= $generator->ns ?>\base;
 
 use Yii;
+<?php foreach ($relations as $name => $relation): ?>
+use <?= $generator->ns.'\\'.$name . ";\n" ?>
+<?php endforeach; ?>
 
 /**
  * This is the model class for table "<?= $tableName ?>".
