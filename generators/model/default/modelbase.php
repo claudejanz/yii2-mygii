@@ -19,7 +19,7 @@ namespace <?= $generator->ns ?>\base;
 
 use Yii;
 <?php foreach ($relations as $name => $relation): ?>
-use <?= $generator->ns.'\\'.$name . ";\n" ?>
+use <?= $generator->ns ?>\<?= $relation[1] . ";\n" ?>
 <?php endforeach; ?>
 
 /**
