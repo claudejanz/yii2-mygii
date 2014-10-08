@@ -67,4 +67,4 @@ if (($tableSchema = $generator->getTableSchema()) === false) {
     ]) ?>
 <?php endif; ?>
 
-</div>
+
