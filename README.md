@@ -1,5 +1,8 @@
 yii2-double-model-gii
-==========
+=====================
+
+[![Latest Stable Version](https://poser.pugx.org/claudejanz/yii2-mygii/v/stable.svg)](https://packagist.org/packages/claudejanz/yii2-mygii) [![Total Downloads](https://poser.pugx.org/claudejanz/yii2-mygii/downloads.svg)](https://packagist.org/packages/claudejanz/yii2-mygii) [![Latest Unstable Version](https://poser.pugx.org/claudejanz/yii2-mygii/v/unstable.svg)](https://packagist.org/packages/claudejanz/yii2-mygii) [![License](https://poser.pugx.org/claudejanz/yii2-mygii/license.svg)](https://packagist.org/packages/claudejanz/yii2-mygii)
+
 
 This generator generates two ActiveRecord class for the specified database table. An empty one you can extend and a Base one which is the same as the original model generatior.
 
