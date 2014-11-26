@@ -1,6 +1,7 @@
 {
     "name": "claudejanz/yii2-mygii",
     "description": "Gii Generator for double model generation",
+    "license": "BSD-4-Clause",
     "authors": [
         {
             "name": "Claude Janz",
