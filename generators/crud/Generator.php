@@ -37,7 +37,7 @@ class Generator extends \yii\gii\Generator {
     public $baseControllerClass = 'yii\web\Controller';
     public $indexWidgetType = 'grid';
     public $searchModelClass;
-    public $exceptions;
+    public $exceptions = 'created_by, created_at, updated_by, updated_at';
     public $exceptionsArray =[];
 
     /**
@@ -132,7 +132,7 @@ class Generator extends \yii\gii\Generator {
      * @inheritdoc
      */
     public function stickyAttributes() {
-        return array_merge(parent::stickyAttributes(), ['baseControllerClass', 'moduleID', 'indexWidgetType']);
+        return array_merge(parent::stickyAttributes(), ['baseControllerClass', 'moduleID', 'indexWidgetType','exceptions']);
     }
 
     /**
