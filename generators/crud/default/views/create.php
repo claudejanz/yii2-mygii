@@ -11,16 +11,11 @@ use yii\helpers\StringHelper;
 echo "<?php\n";
 ?>
 
-use yii\helpers\Html;
+use <?= ltrim($generator->modelClass, '\\') ?>;
+use yii\web\View;
 
-/**
- * @var yii\web\View $this
- * @var <?= ltrim($generator->modelClass, '\\') ?> $model
- */
-
-$this->title = <?= $generator->generateString('Create {modelClass}', ['modelClass' => Inflector::camel2words(StringHelper::basename($generator->modelClass))]) ?>;
-$this->params['breadcrumbs'][] = ['label' => <?= $generator->generateString(Inflector::pluralize(Inflector::camel2words(StringHelper::basename($generator->modelClass)))) ?>, 'url' => ['index']];
-$this->params['breadcrumbs'][] = $this->title;
+/* @var $this yii\web\View */
+/* @var $model <?= ltrim($generator->modelClass, '\\') ?> */
 ?>
 <div class="<?= Inflector::camel2id(StringHelper::basename($generator->modelClass)) ?>-create">
 

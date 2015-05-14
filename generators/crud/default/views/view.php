@@ -16,14 +16,8 @@ echo "<?php\n";
 use yii\helpers\Html;
 use yii\widgets\DetailView;
 
-/**
- * @var yii\web\View $this
- * @var <?= ltrim($generator->modelClass, '\\') ?> $model
- */
-
-$this->title = $model-><?= $generator->getNameAttribute() ?>;
-$this->params['breadcrumbs'][] = ['label' => <?= $generator->generateString(Inflector::pluralize(Inflector::camel2words(StringHelper::basename($generator->modelClass)))) ?>, 'url' => ['index']];
-$this->params['breadcrumbs'][] = $this->title;
+/* @var $this yii\web\View */
+/* @var $model <?= ltrim($generator->modelClass, '\\') ?> */
 ?>
 <div class="<?= Inflector::camel2id(StringHelper::basename($generator->modelClass)) ?>-view">
 

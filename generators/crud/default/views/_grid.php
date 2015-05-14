@@ -14,19 +14,15 @@ $nameAttribute = $generator->getNameAttribute();
 echo "<?php\n";
 ?>
 
-use yii\helpers\Html;
 use <?= $generator->indexWidgetType === 'grid' ? "yii\\grid\\GridView" : "yii\\widgets\\ListView" ?>;
 
-/**
- * @var yii\web\View $this
- * @var yii\data\ActiveDataProvider $dataProvider
- * @var <?= ltrim($generator->searchModelClass, '\\') ?> $searchModel
- */
-
+/* @var $this yii\web\View */
+/* @var $dataProvider yii\data\ActiveDataProvider */
+/* @var $searchModel <?= ltrim($generator->searchModelClass, '\\') ?> */
 ?>
 
 <?php if ($generator->indexWidgetType === 'grid'): ?>
-    <?= "<?= " ?>GridView::widget([
+    <?= "<?php echo " ?>GridView::widget([
         'dataProvider' => $dataProvider,
         'filterModel' => $searchModel,
         'columns' => [
@@ -58,7 +54,7 @@ if (($tableSchema = $generator->getTableSchema()) === false) {
         ],
     ]); ?>
 <?php else: ?>
-    <?= "<?= " ?>ListView::widget([
+    <?= "<?php echo " ?>ListView::widget([
         'dataProvider' => $dataProvider,
         'itemOptions' => ['class' => 'item'],
         'itemView' => function ($model, $key, $index, $widget) {

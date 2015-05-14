@@ -21,11 +21,9 @@ echo "<?php\n";
 use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
-/**
- * @var yii\web\View $this
- * @var <?= ltrim($generator->modelClass, '\\') ?> $model
- * @var yii\widgets\ActiveForm $form
- */
+/* @var $this yii\web\View */
+/* @var $model <?= ltrim($generator->modelClass, '\\') ?> */
+/* @var $form yii\widgets\ActiveForm */
 ?>
 
 <div class="<?= Inflector::camel2id(StringHelper::basename($generator->modelClass)) ?>-form">
@@ -33,10 +31,10 @@ use yii\widgets\ActiveForm;
     <?= "<?php " ?>$form = ActiveForm::begin(); ?>
 
 <?php foreach ($safeAttributes as $attribute) {
-    if(!in_array($attribute,$generator->exceptionsArray))echo "    <?= " . $generator->generateActiveField($attribute) . " ?>\n\n";
+    if(!in_array($attribute,$generator->exceptionsArray))echo "    <?php echo " . $generator->generateActiveField($attribute) . " ?>\n\n";
 } ?>
     <div class="form-group">
-        <?= "<?= " ?>Html::submitButton($model->isNewRecord ? <?= $generator->generateString('Create') ?> : <?= $generator->generateString('Update') ?>, ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
+        <?= "<?php echo " ?>Html::submitButton($model->isNewRecord ? <?= $generator->generateString('Create') ?> : <?= $generator->generateString('Update') ?>, ['class' => $model->isNewRecord ? 'btn btn-success' : 'btn btn-primary']) ?>
     </div>
 
     <?= "<?php " ?>ActiveForm::end(); ?>

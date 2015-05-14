@@ -14,16 +14,11 @@ echo "<?php\n";
 ?>
 
 use yii\helpers\Html;
-use <?= $generator->indexWidgetType === 'grid' ? "yii\\grid\\GridView" : "yii\\widgets\\ListView" ?>;
 
-/**
-* @var yii\web\View $this
-* @var yii\data\ActiveDataProvider $dataProvider
-* @var <?= ltrim($generator->searchModelClass, '\\') ?> $searchModel
-*/
-
-$this->title = <?= $generator->generateString(Inflector::pluralize(Inflector::camel2words(StringHelper::basename($generator->modelClass)))) ?>;
-$this->params['breadcrumbs'][] = $this->title;
+/* @var $this yii\web\View */
+/* @var $dataProvider yii\data\ActiveDataProvider */
+/* @var $model <?= ltrim($generator->modelClass, '\\') ?> */
+/* @var $searchModel <?= ltrim($generator->searchModelClass, '\\') ?> */
 ?>
 <div class="<?= Inflector::camel2id(StringHelper::basename($generator->modelClass)) ?>-index">
 
