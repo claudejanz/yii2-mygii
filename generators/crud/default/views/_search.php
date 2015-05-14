@@ -12,6 +12,7 @@ echo "<?php\n";
 ?>
 
 use Yii;
+use yii\helpers\Html;
 use yii\widgets\ActiveForm;
 
 /* @var $this yii\web\View */
