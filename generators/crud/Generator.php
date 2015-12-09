@@ -38,7 +38,7 @@ class Generator extends \yii\gii\Generator {
     public $indexWidgetType = 'grid';
     public $searchModelClass;
     public $exceptions = 'created_by, created_at, updated_by, updated_at';
-    public $exceptionsArray =[];
+    public $exceptionsArray = [];
 
     /**
      * @inheritdoc
@@ -76,7 +76,7 @@ class Generator extends \yii\gii\Generator {
             [['messageCategory'], 'validateMessageCategory', 'skipOnEmpty' => false],
         ]);
     }
-    
+
     /**
      * Split params into Array
      * @param type $attribute
@@ -132,7 +132,7 @@ class Generator extends \yii\gii\Generator {
      * @inheritdoc
      */
     public function stickyAttributes() {
-        return array_merge(parent::stickyAttributes(), ['baseControllerClass', 'moduleID', 'indexWidgetType','exceptions']);
+        return array_merge(parent::stickyAttributes(), ['baseControllerClass', 'moduleID', 'indexWidgetType', 'exceptions']);
     }
 
     /**
@@ -219,29 +219,72 @@ class Generator extends \yii\gii\Generator {
      * @return string
      */
     public function generateActiveField($attribute) {
-        $tableSchema = $this->getTableSchema();
-        if ($tableSchema === false || !isset($tableSchema->columns[$attribute])) {
-            if (preg_match('/^(password|pass|passwd|passcode)$/i', $attribute)) {
-                return "\$form->field(\$model, '$attribute')->passwordInput()";
-            } else {
-                return "\$form->field(\$model, '$attribute')";
+        if ($this->template == 'default') {
+            $tableSchema = $this->getTableSchema();
+            if ($tableSchema === false || !isset($tableSchema->columns[$attribute])) {
+                if (preg_match('/^(password|pass|passwd|passcode)$/i', $attribute)) {
+                    return "\$form->field(\$model, '$attribute')->passwordInput()";
+                } else {
+                    return "\$form->field(\$model, '$attribute')";
+                }
             }
-        }
-        $column = $tableSchema->columns[$attribute];
-        if ($column->phpType === 'boolean') {
-            return "\$form->field(\$model, '$attribute')->checkbox()";
-        } elseif ($column->type === 'text') {
-            return "\$form->field(\$model, '$attribute')->textarea(['rows' => 6])";
-        } else {
-            if (preg_match('/^(password|pass|passwd|passcode)$/i', $column->name)) {
-                $input = 'passwordInput';
+            $column = $tableSchema->columns[$attribute];
+            if ($column->phpType === 'boolean') {
+                return "\$form->field(\$model, '$attribute')->checkbox()";
+            } elseif ($column->type === 'text') {
+                return "\$form->field(\$model, '$attribute')->textarea(['rows' => 6])";
             } else {
-                $input = 'textInput';
+                if (preg_match('/^(password|pass|passwd|passcode)$/i', $column->name)) {
+                    $input = 'passwordInput';
+                } else {
+                    $input = 'textInput';
+                }
+                if ($column->phpType !== 'string' || $column->size === null) {
+                    return "\$form->field(\$model, '$attribute')->$input()";
+                } else {
+                    return "\$form->field(\$model, '$attribute')->$input(['maxlength' => $column->size])";
+                }
             }
-            if ($column->phpType !== 'string' || $column->size === null) {
-                return "\$form->field(\$model, '$attribute')->$input()";
+        } elseif ($this->template == 'kartik') {
+            $model = new $this->modelClass();
+            $attributeLabels = $model->attributeLabels();
+            $tableSchema = $this->getTableSchema();
+            if ($tableSchema === false || !isset($tableSchema->columns[$attribute])) {
+                if (preg_match('/^(password|pass|passwd|passcode)$/i', $attribute)) {
+                    return "'$attribute'=>['type'=> TabularForm::INPUT_PASSWORD,'options'=>['placeholder'=>'Enter " . $attributeLabels[$attribute] . "...']],";
+                    //return "\$form->field(\$model, '$attribute')->passwordInput()";
+                } else {
+                    return "'$attribute'=>['type'=> TabularForm::INPUT_TEXT, 'options'=>['placeholder'=>'Enter " . $attributeLabels[$attribute] . "...']],";
+                    //return "\$form->field(\$model, '$attribute')";
+                }
+            }
+            $column = $tableSchema->columns[$attribute];
+            if ($column->phpType === 'boolean') {
+                //return "\$form->field(\$model, '$attribute')->checkbox()";
+                return "'$attribute'=>['type'=> Form::INPUT_CHECKBOX, 'options'=>['placeholder'=>'Enter " . $attributeLabels[$attribute] . "...']],";
+            } elseif ($column->type === 'text') {
+                //return "\$form->field(\$model, '$attribute')->textarea(['rows' => 6])";
+                return "'$attribute'=>['type'=> Form::INPUT_WIDGET, 'widgetClass'=>Redactor::classname(),'options'=>[]],";
+                return "'$attribute'=>['type'=> Form::INPUT_TEXTAREA, 'options'=>['placeholder'=>'Enter " . $attributeLabels[$attribute] . "...','rows'=> 6]],";
+            } elseif ($column->type === 'date') {
+                return "'$attribute'=>['type'=> Form::INPUT_WIDGET, 'widgetClass'=>DateControl::classname(),'options'=>['type'=>DateControl::FORMAT_DATE]],";
+            } elseif ($column->type === 'time') {
+                return "'$attribute'=>['type'=> Form::INPUT_WIDGET, 'widgetClass'=>DateControl::classname(),'options'=>['type'=>DateControl::FORMAT_TIME]],";
+            } elseif ($column->type === 'datetime' || $column->type === 'timestamp') {
+                return "'$attribute'=>['type'=> Form::INPUT_WIDGET, 'widgetClass'=>DateControl::classname(),'options'=>['type'=>DateControl::FORMAT_DATETIME]],";
             } else {
-                return "\$form->field(\$model, '$attribute')->$input(['maxlength' => $column->size])";
+                if (preg_match('/^(password|pass|passwd|passcode)$/i', $column->name)) {
+                    $input = 'INPUT_PASSWORD';
+                } else {
+                    $input = 'INPUT_TEXT';
+                }
+                if ($column->phpType !== 'string' || $column->size === null) {
+                    //return "\$form->field(\$model, '$attribute')->$input()";
+                    return "'$attribute'=>['type'=> Form::" . $input . ", 'options'=>['placeholder'=>'Enter " . $attributeLabels[$attribute] . "...']],";
+                } else {
+                    //return "\$form->field(\$model, '$attribute')->$input(['maxlength' => $column->size])";
+                    return "'$attribute'=>['type'=> Form::" . $input . ", 'options'=>['placeholder'=>'Enter " . $attributeLabels[$attribute] . "...', 'maxlength'=>" . $column->size . "]],";
+                }
             }
         }
     }
