@@ -29,25 +29,36 @@ echo "<?php\n";
 
 namespace <?= StringHelper::dirname(ltrim($generator->controllerClass, '\\')) ?>;
 
-use Yii;
+use <?= ltrim($generator->baseControllerClass, '\\') ?>;
+use app\controllers\behaviors\PageBehavior;
 use <?= ltrim($generator->modelClass, '\\') ?>;
 <?php if (!empty($generator->searchModelClass)): ?>
 use <?= ltrim($generator->searchModelClass, '\\') . (isset($searchModelAlias) ? " as $searchModelAlias" : "") ?>;
 <?php else: ?>
 use yii\data\ActiveDataProvider;
 <?php endif; ?>
-use <?= ltrim($generator->baseControllerClass, '\\') ?>;
-use yii\web\NotFoundHttpException;
+use claudejanz\contextAccessFilter\filters\ContextFilter;
+use Yii;
 use yii\filters\VerbFilter;
+use yii\web\NotFoundHttpException;
+
 
 /**
  * <?= $controllerClass ?> implements the CRUD actions for <?= $modelClass ?> model.
  */
 class <?= $controllerClass ?> extends <?= StringHelper::basename($generator->baseControllerClass) . "\n" ?>
 {
-    public function behaviors()
-    {
+    public function behaviors() {
         return [
+            'context' => [
+                'class' => ContextFilter::className(),
+                'modelName' => Page::className(),
+                'only' => ['view', 'update', 'delete']
+            ],
+            'page' => [
+                'class' => PageBehavior::className(),
+                'actions' => ['index']
+            ],
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [

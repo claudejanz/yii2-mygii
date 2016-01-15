@@ -21,7 +21,7 @@ use yii\base\NotSupportedException;
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @since 2.0
  */
-class Generator extends \yii\gii\Generator
+class Generator extends \yii\gii\generators\model\Generator
 {
     public $db = 'db';
     public $ns = 'app\models';
@@ -58,9 +58,9 @@ class Generator extends \yii\gii\Generator
             [['ns'], 'filter', 'filter' => function($value) { return trim($value, '\\'); }],
 
             [['db', 'ns', 'tableName', 'baseClass'], 'required'],
-            [['db', 'modelClass'], 'match', 'pattern' => '/^\w+$/', 'message' => 'Only word characters are allowed.'],
-            [['ns', 'baseClass'], 'match', 'pattern' => '/^[\w\\\\]+$/', 'message' => 'Only word characters and backslashes are allowed.'],
-            [['tableName'], 'match', 'pattern' => '/^(\w+\.)?([\w\*]+)$/', 'message' => 'Only word characters, and optionally an asterisk and/or a dot are allowed.'],
+//            [['db', 'modelClass'], 'match', 'pattern' => '/^\w+$/', 'message' => 'Only word characters are allowed.'],
+//            [['ns', 'baseClass'], 'match', 'pattern' => '/^[\w\\\\]+$/', 'message' => 'Only word characters and backslashes are allowed.'],
+//            [['tableName'], 'match', 'pattern' => '/^(\w+\.)?([\w\*]+)$/', 'message' => 'Only word characters, and optionally an asterisk and/or a dot are allowed.'],
             [['db'], 'validateDb'],
             [['ns'], 'validateNamespace'],
             [['tableName'], 'validateTableName'],
@@ -421,34 +421,7 @@ class Generator extends \yii\gii\Generator
         }
     }
 
-    /**
-     * Generate a relation name for the specified table and a base name.
-     * @param array $relations the relations being generated currently.
-     * @param string $className the class name that will contain the relation declarations
-     * @param \yii\db\TableSchema $table the table schema
-     * @param string $key a base name that the relation name may be generated from
-     * @param boolean $multiple whether this is a has-many relation
-     * @return string the relation name
-     */
-    protected function generateRelationName($relations, $className, $table, $key, $multiple)
-    {
-        if (strcasecmp(substr($key, -2), 'id') === 0 && strcasecmp($key, 'id')) {
-            $key = rtrim(substr($key, 0, -2), '_');
-        }
-        if ($multiple) {
-            $key = Inflector::pluralize($key);
-        }
-        $name = $rawName = Inflector::id2camel($key, '_');
-        $i = 0;
-        while (isset($table->columns[lcfirst($name)])) {
-            $name = $rawName . ($i++);
-        }
-        while (isset($relations[$className][lcfirst($name)])) {
-            $name = $rawName . ($i++);
-        }
-
-        return $name;
-    }
+   
 
     /**
      * Validates the [[db]] attribute.
@@ -570,42 +543,7 @@ class Generator extends \yii\gii\Generator
         return $tableName;
     }
 
-    /**
-     * Generates a class name from the specified table name.
-     * @param string $tableName the table name (which may contain schema prefix)
-     * @return string the generated class name
-     */
-    protected function generateClassName($tableName)
-    {
-        if (isset($this->_classNames[$tableName])) {
-            return $this->_classNames[$tableName];
-        }
-
-        if (($pos = strrpos($tableName, '.')) !== false) {
-            $tableName = substr($tableName, $pos + 1);
-        }
-
-        $db = $this->getDbConnection();
-        $patterns = [];
-        $patterns[] = "/^{$db->tablePrefix}(.*?)$/";
-        $patterns[] = "/^(.*?){$db->tablePrefix}$/";
-        if (strpos($this->tableName, '*') !== false) {
-            $pattern = $this->tableName;
-            if (($pos = strrpos($pattern, '.')) !== false) {
-                $pattern = substr($pattern, $pos + 1);
-            }
-            $patterns[] = '/^' . str_replace('*', '(\w+)', $pattern) . '$/';
-        }
-        $className = $tableName;
-        foreach ($patterns as $pattern) {
-            if (preg_match($pattern, $tableName, $matches)) {
-                $className = $matches[1];
-                break;
-            }
-        }
-
-        return $this->_classNames[$tableName] = Inflector::id2camel($className, '_');
-    }
+   
 
     /**
      * @return Connection the DB connection as specified by [[db]].
@@ -630,5 +568,12 @@ class Generator extends \yii\gii\Generator
         }
 
         return false;
+    }
+     /**
+     * @inheritdoc
+     */
+    public function publicGenerateRelationName($relations, $table, $key, $multiple)
+    {
+        return self::generateRelationName($relations, $table, $key, $multiple);
     }
 }

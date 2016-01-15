@@ -8,10 +8,17 @@
 
 namespace claudejanz\mygii\generators\crud;
 
+use claudejanz\mygii\generators\model\Generator as ModelGenerator;
+use ReflectionClass;
 use Yii;
+use yii\base\Model;
+use yii\db\ActiveQuery;
 use yii\db\ActiveRecord;
 use yii\db\BaseActiveRecord;
+use yii\db\ColumnSchema;
+use yii\db\Exception;
 use yii\db\Schema;
+use yii\db\TableSchema;
 use yii\gii\CodeFile;
 use yii\helpers\Inflector;
 use yii\web\Controller;
@@ -23,13 +30,13 @@ use yii\web\Controller;
  * @property string $controllerID The controller ID (without the module ID prefix). This property is
  * read-only.
  * @property array $searchAttributes Searchable attributes. This property is read-only.
- * @property boolean|\yii\db\TableSchema $tableSchema This property is read-only.
+ * @property boolean|TableSchema $tableSchema This property is read-only.
  * @property string $viewPath The action view file path. This property is read-only.
  *
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @since 2.0
  */
-class Generator extends \yii\gii\Generator {
+class Generator extends \yii\gii\generators\model\Generator {
 
     public $modelClass;
     public $moduleID;
@@ -39,6 +46,11 @@ class Generator extends \yii\gii\Generator {
     public $searchModelClass;
     public $exceptions = 'created_by, created_at, updated_by, updated_at';
     public $exceptionsArray = [];
+
+    /**
+     * @var array relations to be excluded in UI rendering
+     */
+    public $skipRelations = [];
 
     /**
      * @inheritdoc
@@ -206,7 +218,7 @@ class Generator extends \yii\gii\Generator {
                 return $name;
             }
         }
-        /** @var \yii\db\ActiveRecord $class */
+        /** @var ActiveRecord $class */
         $class = $this->modelClass;
         $pk = $class::primaryKey();
 
@@ -382,7 +394,7 @@ class Generator extends \yii\gii\Generator {
      * @return array the generated attribute labels (name => label)
      */
     public function generateSearchLabels() {
-        /** @var \yii\base\Model $model */
+        /** @var Model $model */
         $model = new $this->modelClass();
         $attributeLabels = $model->attributeLabels();
         $labels = [];
@@ -413,7 +425,7 @@ class Generator extends \yii\gii\Generator {
         $columns = [];
         if (($table = $this->getTableSchema()) === false) {
             $class = $this->modelClass;
-            /** @var \yii\base\Model $model */
+            /** @var Model $model */
             $model = new $class();
             foreach ($model->attributes() as $attribute) {
                 $columns[$attribute] = 'unknown';
@@ -525,7 +537,7 @@ class Generator extends \yii\gii\Generator {
 
     /**
      * Returns table schema for current model class or false if it is not an active record
-     * @return boolean|\yii\db\TableSchema
+     * @return boolean|TableSchema
      */
     public function getTableSchema() {
         /** @var ActiveRecord $class */
@@ -546,10 +558,121 @@ class Generator extends \yii\gii\Generator {
         if (is_subclass_of($class, 'yii\db\ActiveRecord')) {
             return $class::getTableSchema()->getColumnNames();
         } else {
-            /** @var \yii\base\Model $model */
+            /** @var Model $model */
             $model = new $class();
 
             return $model->attributes();
+        }
+    }
+
+    public function getModelNameAttribute($modelClass) {
+        $model = new $modelClass;
+        // TODO: cleanup, get-label-methods, move to config
+        if ($model->hasMethod('get_label')) {
+            return '_label';
+        }
+        if ($model->hasMethod('getLabel')) {
+            return 'label';
+        }
+        foreach ($modelClass::getTableSchema()->getColumnNames() as $name) {
+            switch (strtolower($name)) {
+                case 'name':
+                case 'title':
+                case 'name_id':
+                case 'default_title':
+                case 'default_name':
+                    return $name;
+                    break;
+                default:
+                    continue;
+                    break;
+            }
+        }
+
+        return $modelClass::primaryKey()[0];
+    }
+
+    /**
+     * Finds relations of a model class
+     *
+     * return values can be filtered by types 'belongs_to', 'many_many', 'has_many', 'has_one', 'pivot'
+     *
+     * @param ActiveRecord $modelClass
+     * @param array $types
+     *
+     * @return array
+     */
+    public function getModelRelations($modelClass, $types = ['belongs_to', 'many_many', 'has_many', 'has_one', 'pivot']) {
+        $reflector = new ReflectionClass($modelClass);
+        $model = new $modelClass;
+        $stack = [];
+        $modelGenerator = new ModelGenerator;
+        foreach ($reflector->getMethods() AS $method) {
+            if (in_array(substr($method->name, 3), $this->skipRelations)) {
+                continue;
+            }
+            // look for getters
+            if (substr($method->name, 0, 3) !== 'get') {
+                continue;
+            }
+            // skip class specific getters
+            $skipMethods = [
+                'getRelation',
+                'getBehavior',
+                'getFirstError',
+                'getAttribute',
+                'getAttributeLabel',
+                'getOldAttribute'
+            ];
+            if (in_array($method->name, $skipMethods)) {
+                continue;
+            }
+            // check for relation
+            try {
+                $relation = @call_user_func(array($model, $method->name));
+                if ($relation instanceof ActiveQuery) {
+                    #var_dump($relation->primaryModel->primaryKey);
+                    if ($relation->multiple === false) {
+                        $relationType = 'belongs_to';
+                    } elseif ($this->isPivotRelation($relation)) { # TODO: detecttion
+                        $relationType = 'pivot';
+                    } else {
+                        $relationType = 'has_many';
+                    }
+
+                    if (in_array($relationType, $types)) {
+                        $name = $modelGenerator->generateRelationName([$relation], $model->getTableSchema(), substr($method->name, 3), $relation->multiple);
+                        $stack[$name] = $relation;
+                    }
+                }
+            } catch (Exception $e) {
+                Yii::error("Error: " . $e->getMessage(), __METHOD__);
+            }
+        }
+        return $stack;
+    }
+
+    public function isPivotRelation(ActiveQuery $relation) {
+        $model = new $relation->modelClass;
+        $table = $model->tableSchema;
+        $pk = $table->primaryKey;
+        if (count($pk) !== 2) {
+            return false;
+        }
+        $fks = [];
+        foreach ($table->foreignKeys as $refs) {
+            if (count($refs) === 2) {
+                if (isset($refs[$pk[0]])) {
+                    $fks[$pk[0]] = [$refs[0], $refs[$pk[0]]];
+                } elseif (isset($refs[$pk[1]])) {
+                    $fks[$pk[1]] = [$refs[0], $refs[$pk[1]]];
+                }
+            }
+        }
+        if (count($fks) === 2 && $fks[$pk[0]][0] !== $fks[$pk[1]][0]) {
+            return $fks;
+        } else {
+            return false;
         }
     }
 
