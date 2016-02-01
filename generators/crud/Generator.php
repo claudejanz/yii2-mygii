@@ -37,6 +37,11 @@ class Generator extends yii\gii\generators\crud\Generator {
     public $exceptionsArray = [];
 
     /**
+     * @var array relations to be excluded in UI rendering
+     */
+    public $skipRelations = [];
+
+    /**
      * @inheritdoc
      */
     public function getName() {
