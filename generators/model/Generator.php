@@ -44,6 +44,11 @@ class Generator extends \yii\gii\generators\model\Generator
     {
         return ['model.php', 'modelbase.php'];
     }
+    
+    public function stickyAttributes()
+    {
+        return array_merge(parent::stickyAttributes(), ['generateQuery']);
+    }
 
     /**
      * @inheritdoc
