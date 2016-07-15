@@ -1,6 +1,6 @@
 <?php
 
-use yii\gii\generators\model\Generator;
+use claudejanz\mygii\generators\model;
 
 /* @var $this yii\web\View */
 /* @var $form yii\widgets\ActiveForm */

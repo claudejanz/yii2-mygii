@@ -44,6 +44,9 @@ to the ```require``` section of your `composer.json` file.
                 'doubleModel' => [
                     'class' => 'claudejanz\mygii\generators\model\Generator',
                 ],
+                'kartik-crud' => [
+                    'class'     => 'claudejanz\mygii\generators\kcrud\Generator',
+                ],
             ],
         ],
     ],
