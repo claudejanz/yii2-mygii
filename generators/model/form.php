@@ -1,10 +1,13 @@
 <?php
 
-use claudejanz\mygii\generators\model;
+use claudejanz\mygii\generators\model\Generator;
+use yii\web\View;
+use yii\widgets\ActiveForm;
 
-/* @var $this yii\web\View */
-/* @var $form yii\widgets\ActiveForm */
-/* @var $generator yii\gii\generators\form\Generator */
+/* @var $this View */
+/* @var $form ActiveForm */
+/* @var $generator Generator */
+
 
 echo $form->field($generator, 'tableName');
 echo $form->field($generator, 'modelClass');
