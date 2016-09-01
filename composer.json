@@ -9,6 +9,7 @@
         }
     ],
     "require": {
+        "yiisoft/yii2": "*",
         "yiisoft/yii2-bootstrap": "*",
         "kartik-v/yii2-builder": "*",
         "kartik-v/yii2-widgets": "*",
