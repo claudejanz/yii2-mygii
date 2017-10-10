@@ -20,6 +20,7 @@ echo $form->field($generator, 'generateRelations')->dropDownList([
     Generator::RELATIONS_ALL => Yii::t('yii', 'All relations'),
     Generator::RELATIONS_ALL_INVERSE => Yii::t('yii', 'All relations with inverse'),
 ]);
+echo $form->field($generator, 'generateRelationsFromCurrentSchema')->checkbox();
 echo $form->field($generator, 'generateLabelsFromComments')->checkbox();
 echo $form->field($generator, 'generateQuery')->checkbox();
 echo $form->field($generator, 'queryNs');

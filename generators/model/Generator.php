@@ -10,6 +10,7 @@ namespace claudejanz\mygii\generators\model;
 
 use Yii;
 use yii\gii\CodeFile;
+use yii\gii\generators\model\Generator as YiiGenerator;
 
 /**
  * This generator will generate one or multiple ActiveRecord classes for the specified database table.
@@ -17,7 +18,7 @@ use yii\gii\CodeFile;
  * @author Qiang Xue <qiang.xue@gmail.com>
  * @since 2.0
  */
-class Generator extends \yii\gii\generators\model\Generator
+class Generator extends YiiGenerator
 {
    
 
@@ -37,6 +38,28 @@ class Generator extends \yii\gii\generators\model\Generator
         return 'This generator generates two ActiveRecord class for the specified database table. An empty one you can extend and a Base one which is the same as the original model generatior.';
     }
 
+    
+
+    
+  
+
+    /**
+     * @inheritdoc
+     */
+    public function autoCompleteData()
+    {
+        $db = $this->getDbConnection();
+        if ($db !== null) {
+            return [
+                'tableName' => function () use ($db) {
+                    return $db->getSchema()->getTableNames();
+                },
+            ];
+        } else {
+            return [];
+        }
+    }
+
     /**
      * @inheritdoc
      */
@@ -45,10 +68,8 @@ class Generator extends \yii\gii\generators\model\Generator
         return ['model.php', 'modelbase.php'];
     }
     
-    public function stickyAttributes()
-    {
-        return array_merge(parent::stickyAttributes(), ['generateQuery']);
-    }
+ 
+  
 
     /**
      * @inheritdoc
@@ -68,6 +89,7 @@ class Generator extends \yii\gii\generators\model\Generator
                 'className' => $modelClassName,
                 'queryClassName' => $queryClassName,
                 'tableSchema' => $tableSchema,
+                'properties' => $this->generateProperties($tableSchema),
                 'labels' => $this->generateLabels($tableSchema),
                 'rules' => $this->generateRules($tableSchema),
                 'relations' => isset($relations[$tableName]) ? $relations[$tableName] : [],
@@ -87,6 +109,9 @@ class Generator extends \yii\gii\generators\model\Generator
                 );
             }
         }
+
         return $files;
     }
+
 }
+
