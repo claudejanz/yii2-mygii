@@ -20,7 +20,6 @@ use yii\gii\generators\model\Generator as YiiGenerator;
  */
 class Generator extends YiiGenerator
 {
-   
 
     /**
      * @inheritdoc
@@ -39,9 +38,6 @@ class Generator extends YiiGenerator
     }
 
     
-
-    
-  
 
     /**
      * @inheritdoc
@@ -67,9 +63,6 @@ class Generator extends YiiGenerator
     {
         return ['model.php', 'modelbase.php'];
     }
-    
- 
-  
 
     /**
      * @inheritdoc
@@ -114,4 +107,3 @@ class Generator extends YiiGenerator
     }
 
 }
-
