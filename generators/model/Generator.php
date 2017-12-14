@@ -105,5 +105,31 @@ class Generator extends YiiGenerator
 
         return $files;
     }
+      /**
+     * Generates the properties for the specified table.
+     * @param \yii\db\TableSchema $table the table schema
+     * @return array the generated properties (property => type)
+     * @since 2.0.6
+     */
+    protected function generateProperties($table)
+    {
+        $properties = [];
+        foreach ($table->columns as $column) {
+            $columnPhpType = $column->phpType;
+            if ($columnPhpType === 'integer') {
+                $type = 'int';
+            } elseif ($columnPhpType === 'boolean') {
+                $type = 'bool';
+            } else {
+                $type = $columnPhpType;
+            }
+            $properties[$column->name] = [
+                'type' => $type,
+                'name' => $column->name,
+                'comment' => $column->comment,
+            ];
+        }
 
+        return $properties;
+    }
 }
